@@ -32,12 +32,12 @@ namespace TulaOSC
                     time = DateTime.Now;
                     Minutos = time.Minute;
                     Horas = time.Hour;
-                    var message = new SharpOSC.OscMessage("/avatar/parameters/timeH",Horas/200);
+                    var message = new SharpOSC.OscMessage("/avatar/parameters/timeH",Horas/25);
                     var sender = new SharpOSC.UDPSender(m.localhost, m.port);
                     sender.Send(message);
                     message = new SharpOSC.OscMessage("/avatar/parameters/timeM",Minutos/200);
                     sender.Send(message);
-                    Console.WriteLine("Enviados");
+                    Console.WriteLine("Enviado: "+Horas+":"+Minutos);
                 }
         }
     }
