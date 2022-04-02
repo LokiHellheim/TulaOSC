@@ -5,6 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpOSC;
 using System.Threading;
+using System.IO;
+using Newtonsoft.Json;
+
 namespace TulaOSC
 {
     class Program
@@ -20,19 +23,30 @@ namespace TulaOSC
 
         private static void getTime() {
 
-            while (true) {
-            Thread.Sleep(10000);
-            time = DateTime.Now;
-            Minutos = time.Minute;
-            Horas = time.Hour;
-            var message = new SharpOSC.OscMessage("/avatar/parameters/timeH",Horas/200);
-            var sender = new SharpOSC.UDPSender("127.0.0.1", 9000);
-            sender.Send(message);
-            message = new SharpOSC.OscMessage("/avatar/parameters/timeM",Minutos/200);
-            sender.Send(message);
-            Console.WriteLine("Enviados");
+                System.IO.StreamReader r = new StreamReader("./config.json");
+                string jsonString = r.ReadToEnd();
+                jsonConfig m = JsonConvert.DeserializeObject<jsonConfig>(jsonString);
 
-            }
+                while (true) {
+                    Thread.Sleep(10000);
+                    time = DateTime.Now;
+                    Minutos = time.Minute;
+                    Horas = time.Hour;
+                    var message = new SharpOSC.OscMessage("/avatar/parameters/timeH",Horas/200);
+                    var sender = new SharpOSC.UDPSender(m.localhost, m.port);
+                    sender.Send(message);
+                    message = new SharpOSC.OscMessage("/avatar/parameters/timeM",Minutos/200);
+                    sender.Send(message);
+                    Console.WriteLine("Enviados");
+                }
         }
+    }
+
+    public class jsonConfig {
+        public string localhost { get; set; }
+        public string widgetId { get; set; }
+        public int port { get; set; }
+
+
     }
 }
