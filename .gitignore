@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 Program.cs
 packages.config
+TulaOSC.csproj
