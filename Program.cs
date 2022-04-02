@@ -7,6 +7,7 @@ using SharpOSC;
 using System.Threading;
 using System.IO;
 using Newtonsoft.Json;
+using WebSocketSharp;
 
 namespace TulaOSC
 {
@@ -15,38 +16,81 @@ namespace TulaOSC
         private static DateTime time;
         private static float Minutos;
         private static float Horas;
-        
+        private static string localhost;
+        private static int port;
         static void Main(string[] args)
         {
-            getTime();
+            StreamReader r = new StreamReader("./config.json");
+            string jsonString = r.ReadToEnd();
+            jsonConfig m = JsonConvert.DeserializeObject<jsonConfig>(jsonString);
+            localhost = m.localhost;
+            port = m.port; 
+
+            getHR(m.wsUrl);
+            getTime(m.localhost, m.port);
+
         }
 
-        private static void getTime() {
+        private static void getTime(string localhost, int port)
+        {
 
-                System.IO.StreamReader r = new StreamReader("./config.json");
-                string jsonString = r.ReadToEnd();
-                jsonConfig m = JsonConvert.DeserializeObject<jsonConfig>(jsonString);
+            while (true)
+            {
+                Thread.Sleep(10000);
+                time = DateTime.Now;
+                Minutos = time.Minute;
+                Horas = time.Hour;
+                var message = new SharpOSC.OscMessage("/avatar/parameters/timeH", Horas / 25);
+                var sender = new SharpOSC.UDPSender(localhost, port);
+                sender.Send(message);
+                message = new SharpOSC.OscMessage("/avatar/parameters/timeM", Minutos / 200);
+                sender.Send(message);
+                Console.WriteLine("Enviado: " + Horas + ":" + Minutos);
+            }
+        }
+        private static void getHR(string wsUrl)
+        {
+            var ws = new WebSocket(wsUrl);
 
-                while (true) {
-                    Thread.Sleep(10000);
-                    time = DateTime.Now;
-                    Minutos = time.Minute;
-                    Horas = time.Hour;
-                    var message = new SharpOSC.OscMessage("/avatar/parameters/timeH",Horas/25);
-                    var sender = new SharpOSC.UDPSender(m.localhost, m.port);
-                    sender.Send(message);
-                    message = new SharpOSC.OscMessage("/avatar/parameters/timeM",Minutos/200);
-                    sender.Send(message);
-                    Console.WriteLine("Enviado: "+Horas+":"+Minutos);
-                }
+
+                ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
+            ws.OnMessage += onMessageWS;
+
+            ws.Connect();
+
+          
+
+        }
+
+        private static void onMessageWS(object sender, MessageEventArgs e)
+        {
+            jsonStromno m = JsonConvert.DeserializeObject<jsonStromno>(e.Data.ToString());
+            Console.WriteLine("Heart Rate : " + m.data.heartRate);
+
+            var message = new SharpOSC.OscMessage("/avatar/parameters/hr_connected", true);
+            var s = new SharpOSC.UDPSender(localhost, port);
+            s.Send(message);
+            message = new SharpOSC.OscMessage("/avatar/parameters/hr_percent", m.data.heartRate / 200);
+            s.Send(message);
+
         }
     }
 
-    public class jsonConfig {
+    public class jsonConfig
+    {
         public string localhost { get; set; }
         public string widgetId { get; set; }
         public int port { get; set; }
-
-
+        public string wsUrl { get; set; }
     }
+    public class jsonStromno
+    {
+        public string timestamp { get; set; }
+        public jsonHR data { get; set; }
+    }
+    public class jsonHR
+    {
+        public float heartRate { get; set; }
+    }
+
 }
