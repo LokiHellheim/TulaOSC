@@ -18,20 +18,22 @@ namespace TulaOSC
         private static float Horas;
         private static string localhost;
         private static int port;
+        private static string wsUrl;
         static void Main(string[] args)
         {
             StreamReader r = new StreamReader("./config.json");
             string jsonString = r.ReadToEnd();
             jsonConfig m = JsonConvert.DeserializeObject<jsonConfig>(jsonString);
             localhost = m.localhost;
-            port = m.port; 
+            port = m.port;
+            wsUrl = m.wsUrl;
 
-            getHR(m.wsUrl);
-            getTime(m.localhost, m.port);
+            getHR();
+            getTime();
 
         }
 
-        private static void getTime(string localhost, int port)
+        private static void getTime()
         {
 
             while (true)
@@ -40,15 +42,15 @@ namespace TulaOSC
                 time = DateTime.Now;
                 Minutos = time.Minute;
                 Horas = time.Hour;
-                var message = new SharpOSC.OscMessage("/avatar/parameters/timeH", Horas / 25);
-                var sender = new SharpOSC.UDPSender(localhost, port);
+                var message = new OscMessage("/avatar/parameters/timeH", Horas / 25);
+                var sender = new UDPSender(localhost, port);
                 sender.Send(message);
-                message = new SharpOSC.OscMessage("/avatar/parameters/timeM", Minutos / 200);
+                message = new OscMessage("/avatar/parameters/timeM", Minutos / 200);
                 sender.Send(message);
                 Console.WriteLine("Enviado: " + Horas + ":" + Minutos);
             }
         }
-        private static void getHR(string wsUrl)
+        private static void getHR()
         {
             var ws = new WebSocket(wsUrl);
 
