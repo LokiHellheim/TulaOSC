@@ -52,29 +52,54 @@ namespace TulaOSC
         }
         private static void getHR()
         {
-            var ws = new WebSocket(wsUrl);
-
-
+            try
+            {
+                var ws = new WebSocket(wsUrl);
                 ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
-            ws.OnMessage += onMessageWS;
+                ws.OnMessage += onMessageWS;
+               
+                ws.Connect();
+                
+            }catch (Exception ex)
+            { Console.WriteLine(ex.ToString()); }
 
-            ws.Connect();
-
-          
-
+           
         }
-
+        private static System.Timers.Timer aTimer;
         private static void onMessageWS(object sender, MessageEventArgs e)
         {
+            if(aTimer != null){
+                aTimer.Stop();
+                aTimer.Dispose();   
+            }
             jsonStromno m = JsonConvert.DeserializeObject<jsonStromno>(e.Data.ToString());
             Console.WriteLine("Heart Rate : " + m.data.heartRate);
 
-            var message = new SharpOSC.OscMessage("/avatar/parameters/hr_connected", true);
-            var s = new SharpOSC.UDPSender(localhost, port);
+            var message = new OscMessage("/avatar/parameters/hr_connected", true);
+            var s = new UDPSender(localhost, port);
             s.Send(message);
-            message = new SharpOSC.OscMessage("/avatar/parameters/hr_percent", m.data.heartRate / 200);
+            message = new OscMessage("/avatar/parameters/hr_percent", m.data.heartRate / 200);
             s.Send(message);
 
+            SetTimer();
+
+
+        }
+
+        private static void SetTimer()
+        {
+            // Create a timer with a two second interval.
+            aTimer = new System.Timers.Timer(10000);
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += OnTimedEvent;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
+        }
+        private static void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            var message = new OscMessage("/avatar/parameters/hr_connected", false);
+            var s = new UDPSender(localhost, port);
+            s.Send(message);
         }
     }
 
