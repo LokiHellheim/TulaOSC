@@ -56,7 +56,7 @@
       <HintPath>packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="SharpOSC">
-      <HintPath>..\..\SharpOSC\Binaries\Latest\v0.1.1.0\Release\SharpOSC.dll</HintPath>
+      <HintPath>E:\Munra\Downloads\SharpOSC.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
