@@ -11,11 +11,13 @@ namespace TulaOSC
     class Program
     {
         private static DateTime time;
-        private static float Minutos;
-        private static float Horas;
+        private static float minutes;
+        private static float hours;
         private static string localhost;
         private static int port;
         private static string wsUrl;
+        private static System.Timers.Timer aTimer;
+
         static void Main(string[] args)
         {
             StreamReader r = new StreamReader("./config.json");
@@ -25,35 +27,35 @@ namespace TulaOSC
             port = m.port;
             wsUrl = m.wsUrl;
 
-            getHR();
-            getTime();
+            GetHR();
+            GetTime();
 
         }
 
-        private static void getTime()
+        private static void GetTime()
         {
 
             while (true)
             {
                 Thread.Sleep(10000);
                 time = DateTime.Now;
-                Minutos = time.Minute;
-                Horas = time.Hour;
-                var message = new OscMessage("/avatar/parameters/timeH", Horas / 25);
+                minutes = time.Minute;
+                hours = time.Hour;
+                var message = new OscMessage("/avatar/parameters/timeH", hours / 25);
                 var sender = new UDPSender(localhost, port);
                 sender.Send(message);
-                message = new OscMessage("/avatar/parameters/timeM", Minutos / 200);
+                message = new OscMessage("/avatar/parameters/timeM", minutes / 200);
                 sender.Send(message);
-                Console.WriteLine("Enviado: " + Horas + ":" + Minutos);
+                Console.WriteLine("Sent: " + hours + ":" + minutes);
             }
         }
-        private static void getHR()
+        private static void GetHR()
         {
             try
             {
                 var ws = new WebSocket(wsUrl);
                 ws.SslConfiguration.EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12;
-                ws.OnMessage += onMessageWS;
+                ws.OnMessage += OnMessageWS;
                
                 ws.Connect();
                 
@@ -62,8 +64,8 @@ namespace TulaOSC
 
            
         }
-        private static System.Timers.Timer aTimer;
-        private static void onMessageWS(object sender, MessageEventArgs e)
+        
+        private static void OnMessageWS(object sender, MessageEventArgs e)
         {
             if(aTimer != null){
                 aTimer.Stop();
