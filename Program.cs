@@ -4,12 +4,16 @@ using System.Threading;
 using System.IO;
 using Newtonsoft.Json;
 using WebSocketSharp;
+using System.Diagnostics;
 
 
 namespace TulaOSC
 {
     class Program
     {
+
+        private static PerformanceCounter perfCPUCounter;
+        private static PerformanceCounter perfMemCounter;
         private static DateTime time;
         private static float minutes;
         private static float hours;
@@ -37,7 +41,9 @@ namespace TulaOSC
 
             while (true)
             {
-                Thread.Sleep(10000);
+
+                perfCPUCounter = new PerformanceCounter("Processor Information", "% Processor Time", "_Total");
+                perfMemCounter = new PerformanceCounter("Memory", "Available MBytes");
                 time = DateTime.Now;
                 minutes = time.Minute;
                 hours = time.Hour;
@@ -47,6 +53,9 @@ namespace TulaOSC
                 message = new OscMessage("/avatar/parameters/timeM", minutes / 200);
                 sender.Send(message);
                 Console.WriteLine("Sent: " + hours + ":" + minutes);
+                Console.WriteLine((int)perfCPUCounter.NextValue());
+                Console.WriteLine((int)perfMemCounter.NextValue());
+                Thread.Sleep(10000);
             }
         }
         private static void GetHR()
