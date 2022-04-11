@@ -25,6 +25,10 @@ namespace TulaOSC
         private static int port;
         private static string wsUrl;
         private static System.Timers.Timer aTimer;
+        private static float CPU;
+        private static float GPU;
+        private static float RAM;
+        private static float VRAM;
 
         static void Main(string[] args)
         {
@@ -56,26 +60,48 @@ namespace TulaOSC
                 perfCPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 perfCPUCounter.NextValue();
                 Thread.Sleep(1000);
-
+                CPU = (int)perfCPUCounter.NextValue();
                 perfMemCounter = new PerformanceCounter("Memory", "Available MBytes");
                 time = DateTime.Now;
                 minutes = time.Minute;
                 hours = time.Hour;
+
                 var message = new OscMessage("/avatar/parameters/timeH", hours / 25);
                 var sender = new UDPSender(localhost, port);
                 sender.Send(message);
-                message = new OscMessage("/avatar/parameters/timeM", minutes / 200);
-                sender.Send(message);
-                Console.WriteLine("Sent: " + hours + ":" + minutes);
-                Console.WriteLine("Sent Cpu Usage % :" + (int)perfCPUCounter.NextValue()+" %");
-                Console.WriteLine("Sent Memory Free :" + Math.Round((int)perfMemCounter.NextValue()*.0001,3) + " GB");
+
                 var gpuCounters = GetGPUCounters();
                 var gpuUsage = GetGPUUsage(gpuCounters);
                 var gpuMEMCounters = GetGPUMEMCounters();
                 var gpuMEMUsage = GetGPUMEMUsage(gpuMEMCounters);
-                Console.WriteLine("Sent GPU usage : " + Math.Round(gpuUsage,0)+ " %");
-                Console.WriteLine("Sent GPU MEM : " + Math.Round(gpuMEMUsage*.000000001,2)+" GB");
+                
+                message = new OscMessage("/avatar/parameters/timeM", minutes / 200);
+                sender.Send(message);
+                Console.WriteLine("Sent: " + hours + ":" + minutes);
 
+
+                Console.WriteLine("Sent Cpu Usage % :" + CPU + " %");
+                message = new OscMessage("/avatar/parameters/CpuUsage", CPU / 100);
+                sender.Send(message);
+                Console.WriteLine(CPU / 100);
+                
+
+                RAM = (int)perfMemCounter.NextValue();
+                Console.WriteLine("Sent Memory Free :" + Math.Round(RAM*.001,3) + " GB");
+                message = new OscMessage("/avatar/parameters/MemoryFree", (float)Math.Round(RAM* .001,3)/64);
+                sender.Send(message);
+                Console.WriteLine(Math.Round(RAM* .001, 3) / 64);
+
+                Console.WriteLine("Sent GPU usage : " + Math.Round(gpuUsage,0)+ " %");
+                message = new OscMessage("/avatar/parameters/GpuUsage", (float)Math.Round(gpuUsage, 0)/100);
+                sender.Send(message);
+                Console.WriteLine(Math.Round(gpuUsage, 0) / 100);
+                
+                Console.WriteLine("Sent GPU MEM : " + Math.Round(gpuMEMUsage*.0000001,2)+" GB");
+                message = new OscMessage("/avatar/parameters/Vram", (float)Math.Round(gpuMEMUsage * .0000001, 2) / 16);
+                sender.Send(message);
+                Console.WriteLine(Math.Round(gpuMEMUsage * .0000001, 2) / 16);
+                
 
 
 
