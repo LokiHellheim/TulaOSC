@@ -16,8 +16,6 @@ namespace TulaOSC
 
         private static PerformanceCounter perfCPUCounter;
         private static PerformanceCounter perfMemCounter;
-        private static PerformanceCounter perfGPUCounter;
-        private static PerformanceCounter perfGPUMemoryCounter;
         private static DateTime time;
         private static float minutes;
         private static float hours;
@@ -26,9 +24,7 @@ namespace TulaOSC
         private static string wsUrl;
         private static System.Timers.Timer aTimer;
         private static float CPU;
-        private static float GPU;
         private static float RAM;
-        private static float VRAM;
 
         static void Main(string[] args)
         {
