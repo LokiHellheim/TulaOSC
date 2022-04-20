@@ -97,10 +97,10 @@ namespace TulaOSC
                 sender.Send(message);
                 Console.WriteLine(Math.Round(gpuUsage, 0) / 100);
                 
-                Console.WriteLine("Sent GPU MEM : " + Math.Round(gpuMEMUsage*.0000001,2)+" GB");
-                message = new OscMessage("/avatar/parameters/Vram", (float)Math.Round(gpuMEMUsage * .0000001, 2) / 16);
+                Console.WriteLine("Sent GPU MEM : " + Math.Round(gpuMEMUsage*.000000001,2)+" GB");
+                message = new OscMessage("/avatar/parameters/Vram", (float)Math.Round(gpuMEMUsage * .000000001, 2) / 16);
                 sender.Send(message);
-                Console.WriteLine(Math.Round(gpuMEMUsage * .0000001, 2) / 16);
+                Console.WriteLine(Math.Round(gpuMEMUsage * .000000001, 2) / 16);
                 
 
 
@@ -190,7 +190,7 @@ namespace TulaOSC
             var counterNames = category.GetInstanceNames();
 
             var gpuCounters = counterNames
-                                .Where(counterName => counterName.EndsWith("A_phys_0"))
+                                .Where(counterName => counterName.EndsWith("phys_0"))
                                 .SelectMany(counterName => category.GetCounters(counterName))
                                 .Where(counter => counter.CounterName.Equals("Total Committed"))
                                 .ToList();
