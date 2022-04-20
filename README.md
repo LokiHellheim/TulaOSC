@@ -1,4 +1,12 @@
 # TulaOSC
+
+TulaOSC is a application that sends through OSC messaging, float values that represent the heartrate of the user using the pulsoid API and websocket.
+Also send CPU usage, Ram usage, GPU usage, and VRAM.
+-Tested on apple watch with the application stromno
+-Tested on NVIDIA graphics cards, verion of driver 512.15
+
+
+
 The MIT License (MIT)
 Copyright © 2022 <copyright holders>
 
