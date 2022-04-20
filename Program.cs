@@ -16,6 +16,8 @@ namespace TulaOSC
 
         private static PerformanceCounter perfCPUCounter;
         private static PerformanceCounter perfMemCounter;
+        private static PerformanceCounter perfGPUCounter;
+        private static PerformanceCounter perfGPUMemoryCounter;
         private static DateTime time;
         private static float minutes;
         private static float hours;
@@ -24,7 +26,9 @@ namespace TulaOSC
         private static string wsUrl;
         private static System.Timers.Timer aTimer;
         private static float CPU;
+        private static float GPU;
         private static float RAM;
+        private static float VRAM;
 
         static void Main(string[] args)
         {
@@ -75,11 +79,13 @@ namespace TulaOSC
                 sender.Send(message);
                 Console.WriteLine("Sent: " + hours + ":" + minutes);
 
+
                 Console.WriteLine("Sent Cpu Usage % :" + CPU + " %");
                 message = new OscMessage("/avatar/parameters/CpuUsage", CPU / 100);
                 sender.Send(message);
                 Console.WriteLine(CPU / 100);
                 
+
                 RAM = (int)perfMemCounter.NextValue();
                 Console.WriteLine("Sent Memory Free :" + Math.Round(RAM*.001,3) + " GB");
                 message = new OscMessage("/avatar/parameters/MemoryFree", (float)Math.Round(RAM* .001,3)/64);
@@ -91,10 +97,10 @@ namespace TulaOSC
                 sender.Send(message);
                 Console.WriteLine(Math.Round(gpuUsage, 0) / 100);
                 
-                Console.WriteLine("Sent GPU MEM : " + Math.Round(gpuMEMUsage* .000000001, 2)+" GB");
-                message = new OscMessage("/avatar/parameters/Vram", (float)Math.Round(gpuMEMUsage * .000000001, 2) / 16);
+                Console.WriteLine("Sent GPU MEM : " + Math.Round(gpuMEMUsage*.0000001,2)+" GB");
+                message = new OscMessage("/avatar/parameters/Vram", (float)Math.Round(gpuMEMUsage * .0000001, 2) / 16);
                 sender.Send(message);
-                Console.WriteLine(Math.Round(gpuMEMUsage * .000000001, 2) / 16);
+                Console.WriteLine(Math.Round(gpuMEMUsage * .0000001, 2) / 16);
                 
 
 
@@ -184,7 +190,7 @@ namespace TulaOSC
             var counterNames = category.GetInstanceNames();
 
             var gpuCounters = counterNames
-                                .Where(counterName => counterName.EndsWith("_phys_0"))
+                                .Where(counterName => counterName.EndsWith("A_phys_0"))
                                 .SelectMany(counterName => category.GetCounters(counterName))
                                 .Where(counter => counter.CounterName.Equals("Total Committed"))
                                 .ToList();
