@@ -188,7 +188,7 @@ namespace TulaOSC
             var gpuCounters = counterNames
                                 .Where(counterName => counterName.EndsWith("phys_0"))
                                 .SelectMany(counterName => category.GetCounters(counterName))
-                                .Where(counter => counter.CounterName.Equals("Total Committed"))
+                                .Where(counter => counter.CounterName.Equals("Dedicated Usage"))
                                 .ToList();
 
             return gpuCounters;
