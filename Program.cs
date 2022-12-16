@@ -53,10 +53,11 @@ namespace TulaOSC
                  perfGPUMemoryCounter = new PerformanceCounter("GPU Adapter Memory", "Dedicated Usage", "luid_0x00000000_0x0000F44A_phys_0");
                  Console.WriteLine("Sent GPUMemory On usage :" + (ulong)perfGPUMemoryCounter.NextValue()/1000000 + " MB");
                  Console.WriteLine("Sent GPU Usage % :" + (int)perfGPUCounter.NextValue());*/
-                perfCPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                //perfCPUCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
+                perfCPUCounter = new PerformanceCounter("Processor", "% Idle Time", "_Total");
                 perfCPUCounter.NextValue();
                 Thread.Sleep(1000);
-                CPU = (int)perfCPUCounter.NextValue();
+                CPU = 100-(int)perfCPUCounter.NextValue();
                 perfMemCounter = new PerformanceCounter("Memory", "Available MBytes");
                 time = DateTime.Now;
                 minutes = time.Minute;
@@ -77,9 +78,9 @@ namespace TulaOSC
 
 
                 Console.WriteLine("Sent Cpu Usage % :" + CPU + " %");
-                message = new OscMessage("/avatar/parameters/CpuUsage", CPU / 100);
+                message = new OscMessage("/avatar/parameters/CpuUsage", CPU/100 );
                 sender.Send(message);
-                Console.WriteLine(CPU / 100);
+                Console.WriteLine(CPU/100);
                 
 
                 RAM = (int)perfMemCounter.NextValue();
